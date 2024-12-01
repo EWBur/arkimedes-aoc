@@ -23,7 +23,7 @@ where
     let mut left_list: Vec<u32> = Vec::new();
     let mut right_list: Vec<u32> = Vec::new();
     let lines = read_lines(input_file).unwrap();
-    for line in lines.flatten() {
+    for line in lines.map_while(Result::ok) {
         let columns: Vec<&str> = line.split_whitespace().collect();
         left_list.push(columns[0].parse().unwrap());
         right_list.push(columns[1].parse().unwrap());
@@ -36,8 +36,8 @@ fn build_min_heaps(
     left_list: &mut Vec<u32>,
     right_list: &mut Vec<u32>,
 ) -> (MinHeap<u32>, MinHeap<u32>) {
-    let mut left_heap: BinaryHeap<Reverse<u32>> = BinaryHeap::new();
-    let mut right_heap: BinaryHeap<Reverse<u32>> = BinaryHeap::new();
+    let mut left_heap: MinHeap<u32> = MinHeap::new();
+    let mut right_heap: MinHeap<u32> = MinHeap::new();
     for val in left_list {
         left_heap.push(Reverse(*val));
     }
