@@ -8,9 +8,9 @@ The task is simple, create a folder named after you (or your initials/nickname/g
 ```
 .
 ├── your-name
-    ├── day-one             
-    ├── day-two
-    ...             
+│   ├── day-one             
+│   ├── day-two
+│    ...             
 ├── README.md                    
 ```
 Structure your code in any way that you see fit.
