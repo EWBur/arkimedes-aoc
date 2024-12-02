@@ -1,6 +1,6 @@
 # arkimedes-aoc
 
-Welcome to this year's advent of code for Arkimedes apostlar:tm: and friends.
+Welcome to this year's advent of code for Arkimedes apostlar™️ and friends.
 
 ## What do I do?
 
