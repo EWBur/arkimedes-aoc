@@ -19,14 +19,22 @@ fn main() {
     #[cfg(feature = "dev")]
     println!("The input string: {}", input_string);
 
-    let re = Regex::new(r"mul\((\d{1,3}),(\d{1,3})\)").unwrap();
+    let re = Regex::new(r"mul\((\d{1,3}),(\d{1,3})\)|do\(\)|don't\(\)").unwrap();
 
-    let mut result = 0;  
+    let mut result = 0;
+    let mut mul_activated = true;
+    
     for caps in re.captures_iter(&input_string) {
-        let x = &caps[1]; 
-        let y = &caps[2];
-        result += x.parse::<i32>().unwrap() * y.parse::<i32>().unwrap();
+        #[cfg(feature = "dev")]
+        println!("{:?}", caps);
+        
+        if (&caps[0] == "do()") | (&caps[0] == "don't()"){
+            mul_activated = &caps[0] == "do()";
+        }else if mul_activated {
+            let x = &caps[1]; 
+            let y = &caps[2];
+            result += x.parse::<i32>().unwrap() * y.parse::<i32>().unwrap();
+        }
     }
     println!("Result result: {}", result);
-    
 }
