@@ -77,5 +77,5 @@ fn main() {
         correct_combinations += check_correct_combinations(r, eq)
     }
 
-    println!("The number of correct combinations are {}", correct_combinations);
+    println!("The sum of correct combinations are {}", correct_combinations);
 }
