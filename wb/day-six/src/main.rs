@@ -165,8 +165,6 @@ fn add_obstacles(map: &mut Vec<Vec<char>>, start_pos: Vector2, start_dir: Direct
     loops
 }
 
-
-
 fn main() {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
@@ -179,13 +177,9 @@ fn main() {
     let mut guard = Guard::new(start_pos,Direction::Up);
 
     walk_map_checking_for_loops(&mut guard, &lab_map);
-
     log::info!("Number of distinct positions was: {}", guard.path.keys().len());
 
     let n_loops = add_obstacles(&mut lab_map, start_pos, Direction::Up);
-
     log::info!("Number of loops creatable with one more obstacle was: {}", n_loops);
-
-
 
 }
