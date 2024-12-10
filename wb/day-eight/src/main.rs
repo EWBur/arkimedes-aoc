@@ -1,5 +1,5 @@
 use itertools::iproduct;
-use std::{collections::HashMap,collections::HashSet, fs};
+use std::{collections::HashMap, collections::HashSet, fs};
 
 #[cfg(feature = "dev")]
 const FILE_NAME: &str = "test.txt";
@@ -55,34 +55,62 @@ fn in_bounds(position: Point, x_lim: isize, y_lim: isize) -> bool {
     x_in_bound && y_in_bound
 }
 
-fn get_all_antinodes(map: &Vec<Vec<char>>, antennas: &HashMap<char, Vec<Point>>) -> Vec<Point> {
+fn evaluate_antinode(
+    fst: Point,
+    snd: Point,
+    x_lim: isize,
+    y_lim: isize,
+) -> (bool, Option<(Point, Point)>) {
+    let an = fst.generate_antinode(&snd);
+    if in_bounds(an, x_lim, y_lim) {
+        return (true, Some((an, fst)));
+    } else {
+        return (false, None);
+    }
+}
+
+fn get_all_antinodes(map: &Vec<Vec<char>>, antennas: &HashMap<char, Vec<Point>>) -> HashSet<Point> {
+    let mut seen_antinodes: HashSet<Point> = HashSet::new();
+    for (_, positions) in antennas {
+        if positions.len() > 1 {
+            for p in positions {
+                seen_antinodes.insert(*p);
+            }
+        }
+    }
+
     let antenna_values: Vec<&Vec<Point>> = antennas.values().collect();
     let x_lim = map.len();
     let y_lim = map[0].len();
-    let mut antinodes: Vec<Point> = Vec::new();
+
     for antenna_types in antenna_values {
-        for (a1, a2) in iproduct!(
-            antenna_types,
-            antenna_types
-        ) {
+        for (a1, a2) in iproduct!(antenna_types, antenna_types) {
             if a1 != a2 {
-                let an = a1.generate_antinode(a2);
-                if in_bounds(an, x_lim as isize, y_lim as isize)
+                let mut new_an1 = a1.clone();
+                let mut new_an2 = a2.clone();
+
+                while let (true, Some((next_an1, next_an2))) =
+                    evaluate_antinode(new_an1, new_an2, x_lim as isize, y_lim as isize)
                 {
-                    log::debug!("Found antinode!\n AN x: {}, y: {}\n fst x: {}, y: {}\n snd x: {}, y: {}\n values {}, {}", an.x,an.y,a1.x,a1.y,a2.x,a2.y, map[a1.y as usize][a1.x as usize], map[a2.y as usize][a2.x as usize]);
-                    antinodes.push(an);
+                    log::debug!("Found antinode: ({},{})", next_an1.x, next_an1.y);
+
+                    seen_antinodes.insert(next_an1);
+                    new_an1 = next_an1;
+                    new_an2 = next_an2;
                 }
             }
         }
     }
-    
-    antinodes
+    seen_antinodes
 }
 
-fn visualize_antinodes(mut map: Vec<Vec<char>>, antennas: &Vec<Point>) {
+fn visualize_antinodes(mut map: Vec<Vec<char>>, antennas: &HashSet<Point>) {
     for a in antennas {
-        map[a.y as usize][a.x as usize] = '#';
+        if map[a.y as usize][a.x as usize] == '.' {
+            map[a.y as usize][a.x as usize] = '#';
+        }
     }
+
     for row in map {
         for value in row {
             print!("{} ", value);
@@ -95,13 +123,12 @@ fn main() {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
     let antenna_map: Vec<Vec<char>> = read_matrix(FILE_NAME);
-    let antennas: HashMap<char, Vec<Point>> = find_antennas(&antenna_map);
-    let antinodes = get_all_antinodes(&antenna_map, &antennas);
+    let antennas: HashMap<char, Vec<Point>> = find_antennas(&antenna_map.clone());
+    let antinodes = get_all_antinodes(&antenna_map, &antennas.clone());
 
     visualize_antinodes(antenna_map.clone(), &antinodes);
 
-    let unique_antinodes: HashSet<_> = antinodes.into_iter().collect();
-    println!("The number of antinodes is {}", unique_antinodes.len());
+    log::info!("The number of antinodes is {}", antinodes.len());
 }
 
 #[cfg(test)]
