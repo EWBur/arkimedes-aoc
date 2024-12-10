@@ -90,8 +90,6 @@ impl Guard {
     }
 }
 
-
-
 fn read_matrix(path: &str) -> Vec<Vec<char>> {
     let file = fs::read_to_string(path).expect("Could not read file"); 
     let mut matrix: Vec<Vec<char>> = Vec::new();
